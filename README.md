@@ -1,9 +1,9 @@
 # eWa
-Whatsapp Exporter
 
-docker build -t whatsapp-exporter-ios .
+docker build -t imessage-exporter .
 
 docker run --rm \
-  -v /Users/3dy/Downloads/eWA/00008020-000475A13C42002E:/backup \
-  -v /Users/3dy/Downloads/output:/output \
-  whatsapp-exporter-ios -i -b /backup -o /output
+  -v "/Users/3dy/Library/Application Support/MobileSync/Backup/00008110-0018159E1EC0401E:/backup" \
+  -v "/Users/3dy/Downloads/output:/output" \
+  imessage-exporter \
+  -a iOS -p /backup -o /output -f html
