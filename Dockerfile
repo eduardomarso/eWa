@@ -1,5 +1,5 @@
 # Stage 1: Build the imessage-exporter binary
-FROM rust:latest as builder
+FROM rust:latest AS builder
 
 # Install build dependencies
 RUN apt-get update --fix-missing && apt-get install -y \
@@ -14,11 +14,26 @@ RUN apt-get update --fix-missing && apt-get install -y \
 
 # Clone the imessage-exporter repository
 WORKDIR /app
-RUN git clone https://github.com/edychat/imessage-exporter.git
+RUN git clone https://github.com/ReagentX/imessage-exporter.git
 
 # Remove Cargo.lock if exists, in case it's causing issues
 RUN rm -f /app/imessage-exporter/Cargo.lock
 
-# Build the imessage-exporter binary without the lock file
+# Build the imessage-exporter binary
 WORKDIR /app/imessage-exporter
 RUN cargo build --release
+
+# Stage 2: Create a minimal runtime container
+FROM debian:latest
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y libssl-dev libsqlite3-dev
+
+# Copy the built binary from the builder stage
+COPY --from=builder /app/imessage-exporter/target/release/imessage-exporter /usr/local/bin/imessage-exporter
+
+# Set executable permissions
+RUN chmod +x /usr/local/bin/imessage-exporter
+
+# Default command (can be overridden in docker run)
+ENTRYPOINT ["imessage-exporter"]
